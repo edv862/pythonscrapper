@@ -2,11 +2,13 @@
 import requests
 from lxml import html
 import json
+from datetime import date
+from conect_sqlite3 import dbHelper
 
 
 # Returns a json with products fetched from the search page of cexuk.
 def getUrlProducts():
-    category = 991
+    category = 990
     jsonItems = {"items": []}
 
     # Headers to allow scrapper to fetch data like it is in the category page.
@@ -45,20 +47,24 @@ def getUrlProducts():
 
         # Split to get only "items": [...].
         # Taking advantage of python dinamic typing, first_product is a list
-        first_products = first_products[0].split('"listing":')[1]
+
+        if first_products[0]:
+            if '"listing":' in first_products[0]:
+                first_products = first_products[0].split('"listing":')[1]
+
         
-        # Now is a string
-        first_products = first_products.split("};")[0]
-        
-        # Still a string
-        first_products = json.loads(first_products)
-        
-        # Now is a json
-        jsonItems['items'] += first_products['items']
+                # Now is a string
+                first_products = first_products.split("};")[0]
+                
+                # Still a string
+                first_products = json.loads(first_products)
+                
+                # Now is a json
+                jsonItems['items'] += first_products['items']
 
         # To know when to stop, there is a hidden input value in the site
         # <input type="hidden" id="maxPage" value="the value we need">
-        # maxPage = tree.xpath("//input[@id='maxPage']/@value")[0]
+        maxPage = tree.xpath("//input[@id='maxPage']/@value")[0]
         maxPage = 2
 
         while counter < (maxPage - 1):
@@ -90,9 +96,23 @@ def getUrlProducts():
 
         category += 1
 
-    return jsonItems
+    #print jsonItems['items'][0]['category']
+    for item in jsonItems['items']:
+        print 'PRODUCTO i' 
+        for key in item:
+            print key + ': ' + str(item[key])
+
+        save_url(item['url'], str(date.today()), str(date.today()), True, True)
+        save_category(item['category'], item['subcategory'])
 
 
 if __name__ == '__main__':
-    print getUrlProducts()
+    db = dbHelper()
+    if db.connect('data.db'):
+        print 'conected'
+        getUrlProducts()
+        db.disconnect()
+    else:
+        print 'Error connecting to db.'
+    
 
