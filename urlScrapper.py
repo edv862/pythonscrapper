@@ -9,7 +9,6 @@ from conect_sqlite3 import dbHelper
 # Returns a json with products fetched from the search page of cexuk.
 def getUrlProducts():
     category = 990
-    jsonItems = {"items": []}
 
     # Headers to allow scrapper to fetch data like it is in the category page.
     # We must iterate until we get a 'No results found'
@@ -36,6 +35,8 @@ def getUrlProducts():
     }
 
     while category < 992:
+        products = ''
+        jsonItems = {"items": []}
         counter = 1
         page = requests.get(
             'https://uk.webuy.com/search/index.php?stext=*&catid=' + str(category),
@@ -102,13 +103,17 @@ def getUrlProducts():
 
         db_url = db.save_url(item['url'], str(date.today()), str(date.today()), 1, 1)
         (db_cat, db_subcat) = db.save_category(item['category'], item['subcategory'])
-        db_grade = db.save_grade('', '')
+
+        grade = item['name'].split(',')
+        if len(grade) > 1:
+            db_grade = db.save_grade('', 1)
+        else:
+            db_grade = ''
+
         db_price = db.save_price(db_grade, item['unit_price'], item['cash_price'], item['exchange_price'])
         db.save_product('', '', '', '', '', item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0)
+        
         print item
-        print db_url
-        print db_cat
-
 
 
 if __name__ == '__main__':

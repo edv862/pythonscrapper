@@ -59,8 +59,14 @@ class dbHelper:
     # grade(id, type, active)
     def save_grade(self, t, active):
         cur = self.con.cursor()
-        cur.execute("INSERT INTO grade VALUES(NULL,?,?)",(t, active))
-        return cur.lastrowid
+        cur.execute("SELECT id from grade WHERE type=?",(t,))
+        row = cur.fetchone()
+        if row:
+            grade_id = row[0]
+        else:
+            cur.execute("INSERT INTO grade VALUES(NULL,?,?)",(t, active))
+            grade_id = cur.lastrowid
+        return grade_id
 
     # price(grade, sell_price, buy_price, voucher_price)
     def save_price(self, grade, sell_price, buy_price, voucher_price):
