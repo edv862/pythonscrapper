@@ -98,12 +98,15 @@ def getUrlProducts():
 
     #print jsonItems['items'][0]['category']
     for item in jsonItems['items']:
-        print 'PRODUCTO i' 
-        for key in item:
-            print key + ': ' + str(item[key])
+        print 'PRODUCTO i'
 
-        save_url(item['url'], str(date.today()), str(date.today()), True, True)
-        save_category(item['category'], item['subcategory'])
+        db_url = db.save_url(item['url'], str(date.today()), str(date.today()), 1, 1)
+        db_cat = db.save_category(item['category'], item['subcategory'])
+
+        print item
+        print db_url
+        print db_cat
+
 
 
 if __name__ == '__main__':
@@ -111,6 +114,8 @@ if __name__ == '__main__':
     if db.connect('data.db'):
         print 'conected'
         getUrlProducts()
+        
+        #db.con.commit()
         db.disconnect()
     else:
         print 'Error connecting to db.'

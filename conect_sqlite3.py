@@ -28,24 +28,33 @@ class dbHelper:
     # URL(id, url, last_scrap, last_success, success, is_product)
     def save_url(self, url, last_scrap, last_success, success, is_product):
         cur = self.con.cursor()
-        url_string = "INSERT INTO url VALUES("
-        url_string += url + ",'"
-        url_string += last_scrap + "','"
-        url_string += last_success + "',"
-        url_string += success + ","
-        url_string += is_product + ")"
+        #url_string += str(is_product) + ")"
 
-        cur.execute(url_string)
+        cur.execute("INSERT INTO url VALUES(NULL,?,?,?,?)",(last_scrap, last_success, success,url))
+        return cur.lastrowid
 
 
     # category(id, name, sub-category)
     def save_category(self, category, sub_category):
         cur = self.con.cursor()
-        url_string = "INSERT INTO url VALUES('"
-        url_string += category + "','"
-        url_string += sub_category + "')"
 
-        cur.execute(url_string)
+        cur.execute("SELECT id from subcategory WHERE name=?",(sub_category,))
+        row = cur.fetchone()
+        if row:
+            subcat_id = row[0]
+        else:
+            cur.execute("INSERT INTO subcategory VALUES(NULL,?)",(sub_category,))
+            subcat_id = cur.lastrowid
+
+        cur.execute("SELECT id from category WHERE name=?",(category,))
+        row = cur.fetchone()
+        if row:
+            cat_id = row[0]
+        else:
+            cur.execute("INSERT INTO category VALUES(NULL,?,?)",(category, subcat_id))
+            cat_id = cur.lastrowid
+
+        return cat_id
 
 
     # grade(id, type, active)
@@ -62,6 +71,7 @@ class dbHelper:
         try:
             if self.con:
                 self.con.close()
+                print "DB closed."
         except lite.Error, e:
             print "Error %s:" % e.args[0]
             sys.exit(1)
