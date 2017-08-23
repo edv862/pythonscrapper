@@ -54,18 +54,25 @@ class dbHelper:
             cur.execute("INSERT INTO category VALUES(NULL,?,?)",(category, subcat_id))
             cat_id = cur.lastrowid
 
-        return cat_id
-
+        return (cat_id, subcat_id)
 
     # grade(id, type, active)
-    def save_grade(self, type, active):
+    def save_grade(self, t, active):
         cur = self.con.cursor()
-        url_string = "INSERT INTO url VALUES('"
-        url_string += type + "',"
-        url_string += active + ")"
+        cur.execute("INSERT INTO grade VALUES(NULL,?,?)",(t, active))
+        return cur.lastrowid
 
-        cur.execute(url_string)
+    # price(grade, sell_price, buy_price, voucher_price)
+    def save_price(self, grade, sell_price, buy_price, voucher_price):
+        cur = self.con.cursor()
+        cur.execute("INSERT INTO price VALUES(NULL,?,?,?,?)",(grade, sell_price, buy_price, voucher_price))
+        return cur.lastrowid
 
+    def save_product(self, site_id, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent):
+        cur = self.con.cursor()
+        cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (site_id, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent))
+        return cur.lastrowid
 
     def disconnect(self):
         try:
