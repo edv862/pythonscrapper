@@ -102,7 +102,9 @@ def getUrlProducts():
 
         db_url = db.save_url(item['url'], str(date.today()), str(date.today()), 1, 1)
         (db_cat, db_subcat) = db.save_category(item['category'], item['subcategory'])
-
+        db_grade = db.save_grade('', '')
+        db_price = db.save_price(db_grade, item['unit_price'], item['cash_price'], item['exchange_price'])
+        db.save_product('', '', '', '', '', item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0)
         print item
         print db_url
         print db_cat

@@ -68,10 +68,10 @@ class dbHelper:
         cur.execute("INSERT INTO price VALUES(NULL,?,?,?,?)",(grade, sell_price, buy_price, voucher_price))
         return cur.lastrowid
 
-    def save_product(self, site_id, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent):
+    def save_product(self, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent):
         cur = self.con.cursor()
-        cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (site_id, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent))
+        cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent))
         return cur.lastrowid
 
     def disconnect(self):
