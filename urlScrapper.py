@@ -53,7 +53,6 @@ def getUrlProducts():
             if '"listing":' in first_products[0]:
                 first_products = first_products[0].split('"listing":')[1]
 
-        
                 # Now is a string
                 first_products = first_products.split("};")[0]
                 
@@ -97,9 +96,8 @@ def getUrlProducts():
 
         category += 1
 
-    #print jsonItems['items'][0]['category']
     for item in jsonItems['items']:
-        print 'PRODUCTO i'
+        #print 'PRODUCTO i'
 
         db_grade = ''
         db_url = db.save_url(item['url'], str(date.today()), str(date.today()), 1, 1)
@@ -113,9 +111,12 @@ def getUrlProducts():
             db_grade = db.save_grade('C', 1)
             
         db_price = db.save_price(db_grade, item['unit_price'], item['cash_price'], item['exchange_price'])
-        db.save_product('', '', '', '', '', item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0)
+
+        image = 'https://uk.webuy.com/product_images/' + item['category'] + '/' + item['subcategory'] + '/' + item['id'] + '_s.jpg'
+        print image.replace(" ", "%20")
+        db.save_product('', '', '', '', image.replace(" ","%20"), item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0)
         
-        print item
+        #print item
 
 
 if __name__ == '__main__':

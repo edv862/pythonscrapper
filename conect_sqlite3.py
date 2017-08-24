@@ -76,9 +76,20 @@ class dbHelper:
 
     def save_product(self, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent):
         cur = self.con.cursor()
-        cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent))
-        return cur.lastrowid
+        cur.execute("SELECT id from product WHERE sku=?",(sku,))
+        row = cur.fetchone()
+        if row:
+            p_id = row[0]
+            query = "UPDATE product SET (make=?,model=?,colour=?,capacity=?,img=?,sku=?,url=?,category=?,subcategory=?,grade=?,price=?,"
+            query += "lastupdt=?,frequent=?) WHERE sku=?"
+            cur.execute(query,(make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent, sku))
+            p_id = cur.lastrowid
+        else:
+            cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent))
+            p_id = cur.lastrowid
+
+        return p_id
 
     def disconnect(self):
         try:
