@@ -101,15 +101,17 @@ def getUrlProducts():
     for item in jsonItems['items']:
         print 'PRODUCTO i'
 
+        db_grade = ''
         db_url = db.save_url(item['url'], str(date.today()), str(date.today()), 1, 1)
         (db_cat, db_subcat) = db.save_category(item['category'], item['subcategory'])
-
-        grade = item['name'].split(',')
-        if len(grade) > 1:
-            db_grade = db.save_grade('', 1)
-        else:
-            db_grade = ''
-
+        
+        if ', A' in item['name'] or ', WIFI A' in item['name']:
+            db_grade = db.save_grade('A', 1)
+        elif ', B' in item['name'] or ', WIFI B' in item['name']:
+            db_grade = db.save_grade('B', 1)
+        elif ', C' in item['name'] or ', WIFI C' in item['name']:
+            db_grade = db.save_grade('C', 1)
+            
         db_price = db.save_price(db_grade, item['unit_price'], item['cash_price'], item['exchange_price'])
         db.save_product('', '', '', '', '', item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0)
         
