@@ -80,8 +80,8 @@ class dbHelper:
         row = cur.fetchone()
         if row:
             p_id = row[0]
-            query = "UPDATE product SET (make=?,model=?,colour=?,capacity=?,img=?,sku=?,url=?,category=?,subcategory=?,grade=?,price=?,"
-            query += "lastupdt=?,frequent=?,name=?) WHERE sku=?"
+            query = """UPDATE product SET make=?,model=?,colour=?,capacity=?,img=?,sku=?,url=?,category=?,sub_category=?,grade=?,price=?,
+                last_updated=?,frequent=?,name=? WHERE sku=?"""
             cur.execute(query,(make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent, name, sku))
             p_id = cur.lastrowid
         else:

@@ -64,8 +64,7 @@ def getUrlProducts():
 
         # To know when to stop, there is a hidden input value in the site
         # <input type="hidden" id="maxPage" value="the value we need">
-        maxPage = tree.xpath("//input[@id='maxPage']/@value")[0]
-        maxPage = 2
+        maxPage = int(tree.xpath("//input[@id='maxPage']/@value")[0])
 
         while counter < (maxPage - 1):
             referer = 'https://uk.webuy.com/search/index.php?stext=*&catid=' + str(category)
@@ -91,42 +90,39 @@ def getUrlProducts():
             
             # Now is a json
             jsonItems['items'] += products['items']
-
             counter += 1
 
-        category += 1
-
-    for item in jsonItems['items']:
-        #print 'PRODUCTO i'
-
-        db_grade = ''
-        db_url = db.save_url(item['url'], str(date.today()), str(date.today()), 1, 1)
-        (db_cat, db_subcat) = db.save_category(item['category'], item['subcategory'])
-        
-        if ', A' in item['name'] or ', WIFI A' in item['name']:
-            db_grade = db.save_grade('A', 1)
-        elif ', B' in item['name'] or ', WIFI B' in item['name']:
-            db_grade = db.save_grade('B', 1)
-        elif ', C' in item['name'] or ', WIFI C' in item['name']:
-            db_grade = db.save_grade('C', 1)
+        # Process each item in current category
+        for item in jsonItems['items']:
+            db_grade = ''
+            db_url = db.save_url(item['url'], str(date.today()), str(date.today()), 1, 1)
+            (db_cat, db_subcat) = db.save_category(item['category'], item['subcategory'])
             
-        db_price = db.save_price(db_grade, item['unit_price'], item['cash_price'], item['exchange_price'])
+            if ', A' in item['name'] or ', WIFI A' in item['name']:
+                db_grade = db.save_grade('A', 1)
+            elif ', B' in item['name'] or ', WIFI B' in item['name']:
+                db_grade = db.save_grade('B', 1)
+            elif ', C' in item['name'] or ', WIFI C' in item['name']:
+                db_grade = db.save_grade('C', 1)
+                
+            db_price = db.save_price(db_grade, item['unit_price'], item['cash_price'], item['exchange_price'])
 
-        image = 'https://uk.webuy.com/product_images/' + item['category'] + '/' + item['subcategory'] + '/' + item['id'] + '_s.jpg'
-        print image.replace(" ", "%20")
-        db.save_product('', '', '', '', image.replace(" ","%20"), item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0,'')
-        
-        #print item
+            image = 'https://uk.webuy.com/product_images/' + item['category'] + '/' + item['subcategory'] + '/' + item['id'] + '_s.jpg'
+            db.save_product('', '', '', '', image.replace(" ","%20"), item['id'], db_url, db_cat,
+                db_subcat, db_grade, db_price, str(date.today()), 0,item['name'])
+
+        category += 1
 
 
 if __name__ == '__main__':
     db = dbHelper()
+    
     if db.connect('data.db'):
         print 'conected'
         getUrlProducts()
-        
-        #db.con.commit()
+        db.con.commit()
         db.disconnect()
+
     else:
         print 'Error connecting to db.'
     
