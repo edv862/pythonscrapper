@@ -114,7 +114,7 @@ def getUrlProducts():
 
         image = 'https://uk.webuy.com/product_images/' + item['category'] + '/' + item['subcategory'] + '/' + item['id'] + '_s.jpg'
         print image.replace(" ", "%20")
-        db.save_product('', '', '', '', image.replace(" ","%20"), item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0)
+        db.save_product('', '', '', '', image.replace(" ","%20"), item['id'], db_url, db_cat, db_subcat, db_grade, db_price, str(date.today()), 0,'')
         
         #print item
 

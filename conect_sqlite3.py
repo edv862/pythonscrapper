@@ -74,19 +74,19 @@ class dbHelper:
         cur.execute("INSERT INTO price VALUES(NULL,?,?,?,?)",(grade, sell_price, buy_price, voucher_price))
         return cur.lastrowid
 
-    def save_product(self, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent):
+    def save_product(self, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent, name):
         cur = self.con.cursor()
         cur.execute("SELECT id from product WHERE sku=?",(sku,))
         row = cur.fetchone()
         if row:
             p_id = row[0]
             query = "UPDATE product SET (make=?,model=?,colour=?,capacity=?,img=?,sku=?,url=?,category=?,subcategory=?,grade=?,price=?,"
-            query += "lastupdt=?,frequent=?) WHERE sku=?"
-            cur.execute(query,(make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent, sku))
+            query += "lastupdt=?,frequent=?,name=?) WHERE sku=?"
+            cur.execute(query,(make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent, name, sku))
             p_id = cur.lastrowid
         else:
-            cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                (make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent))
+            cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent,name))
             p_id = cur.lastrowid
 
         return p_id
