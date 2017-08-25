@@ -104,12 +104,10 @@ def getUrlProducts():
                 db_grade = db.save_grade('B', 1)
             elif ', C' in item['name'] or ', WIFI C' in item['name']:
                 db_grade = db.save_grade('C', 1)
-                
-            db_price = db.save_price(db_grade, item['unit_price'], item['cash_price'], item['exchange_price'])
 
             image = 'https://uk.webuy.com/product_images/' + item['category'] + '/' + item['subcategory'] + '/' + item['id'] + '_s.jpg'
-            db.save_product('', '', '', '', image.replace(" ","%20"), item['id'], db_url, db_cat,
-                db_subcat, db_grade, db_price, str(date.today()), 0,item['name'])
+            db.save_product('', '', '', '', image.replace(" ","%20"), item['id'], db_url, db_cat,db_subcat, db_grade, 
+                str(date.today()), 0,item['name'], item['unit_price'], item['cash_price'], item['exchange_price'])
 
         category += 1
 

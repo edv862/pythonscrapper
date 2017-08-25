@@ -28,10 +28,15 @@ class dbHelper:
     # URL(id, url, last_scrap, last_success, success, is_product)
     def save_url(self, url, last_scrap, last_success, success, is_product):
         cur = self.con.cursor()
-        #url_string += str(is_product) + ")"
-
-        cur.execute("INSERT INTO url VALUES(NULL,?,?,?,?)",(last_scrap, last_success, success,url))
-        return cur.lastrowid
+        cur.execute("SELECT id from url WHERE url_dir=?",(url,))
+        row = cur.fetchone()
+        if row:
+            url_id = row[0]
+        else:
+            cur.execute("INSERT INTO url VALUES(NULL,?,?,?,?)",(last_scrap, last_success, success,url))
+            url_id = cur.lastrowid
+        
+        return url_id
 
 
     # category(id, name, sub-category)
@@ -74,17 +79,23 @@ class dbHelper:
         cur.execute("INSERT INTO price VALUES(NULL,?,?,?,?)",(grade, sell_price, buy_price, voucher_price))
         return cur.lastrowid
 
-    def save_product(self, make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent, name):
+    def save_product(self, make, model, colour, capacity, img, sku, url, category, subcategory, grade, lastupdt, frequent, name,
+        unit_price, cash_price, exchange_price):
         cur = self.con.cursor()
-        cur.execute("SELECT id from product WHERE sku=?",(sku,))
+        cur.execute("SELECT id, price from product WHERE sku=?",(sku,))
         row = cur.fetchone()
         if row:
             p_id = row[0]
+            cur.execute("UPDATE price SET grade=?,sell_price=?,buy_price=?,voucher_price=? WHERE id=?",
+                (grade, unit_price, cash_price, exchange_price, row[1]))
+            price = cur.lastrowid
+
             query = """UPDATE product SET make=?,model=?,colour=?,capacity=?,img=?,sku=?,url=?,category=?,sub_category=?,grade=?,price=?,
                 last_updated=?,frequent=?,name=? WHERE sku=?"""
             cur.execute(query,(make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent, name, sku))
             p_id = cur.lastrowid
         else:
+            price = self.save_price(grade, unit_price, cash_price, exchange_price)
             cur.execute("INSERT INTO product VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (make, model, colour, capacity, img, sku, url, category, subcategory, grade, price, lastupdt, frequent,name))
             p_id = cur.lastrowid
