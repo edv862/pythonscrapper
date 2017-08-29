@@ -8,7 +8,7 @@ from conect_sqlite3 import dbHelper
 
 # Returns a json with products fetched from the search page of cexuk.
 def getUrlProducts():
-    category = 990
+    category = 1
 
     # Headers to allow scrapper to fetch data like it is in the category page.
     # We must iterate until we get a 'No results found'
@@ -34,7 +34,7 @@ def getUrlProducts():
         'Connection': 'keep-alive'
     }
 
-    while category < 992:
+    while category < 1000:
         products = ''
         jsonItems = {"items": []}
         counter = 1
