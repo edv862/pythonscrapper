@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 import requests
-from lxml import html
+import logging
 import json
+from lxml import html
 from datetime import date
 from conect_sqlite3 import dbHelper
+from logging.handlers import RotatingFileHandler
 
 
 # Returns a json with products fetched from the search page of cexuk.
 def getUrlProducts():
-    category = 1
+    category = 998
 
     # Headers to allow scrapper to fetch data like it is in the category page.
     # We must iterate until we get a 'No results found'
@@ -113,15 +115,25 @@ def getUrlProducts():
 
 
 if __name__ == '__main__':
-    db = dbHelper()
-    
-    if db.connect('data.db'):
-        print 'conected'
-        getUrlProducts()
-        db.con.commit()
-        db.disconnect()
+    log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
+    logFile = '.\log'
+    my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, 
+                                     backupCount=2, encoding=None, delay=0)
+    my_handler.setFormatter(log_formatter)
+    my_handler.setLevel(logging.INFO)
+    app_log = logging.getLogger('webuy')
+    app_log.setLevel(logging.INFO)
+    app_log.addHandler(my_handler)
 
-    else:
-        print 'Error connecting to db.'
-    
-
+    try:
+        db = dbHelper()
+        
+        if db.connect('data.db'):
+            app_log.info("Conected and Updating database.")
+            getUrlProducts()
+            db.con.commit()
+            db.disconnect()
+        else:
+            app_log.error('Error connecting to db.')
+    except Exception as e:
+        app_log.error(str(e))
